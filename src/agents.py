@@ -15,15 +15,19 @@ from .compliance import detect_bias_signals
 from .policy_store import retrieve_relevant_policies
 
 
-def credit_analyst_node(state: UnderwritingState, llm, policy_store=None) -> UnderwritingState:
+def credit_analyst_node(
+    state: UnderwritingState, llm, policy_store=None
+) -> UnderwritingState:
     """Analyzes borrower's credit profile and payment history."""
     policies = retrieve_relevant_policies(
         "credit score requirements bankruptcies foreclosures late payments",
-        policy_store
+        policy_store,
     )
     app_data = state["sanitized_data"]
     credit_score = app_data.get("credit_score", 0)
-    credit_score_analysis = check_credit_score_policy.invoke({"credit_score": credit_score})
+    credit_score_analysis = check_credit_score_policy.invoke(
+        {"credit_score": credit_score}
+    )
 
     system_prompt = f"""
 You are a Senior Credit Analyst with 15+ years of experience in mortgage underwriting.
@@ -62,10 +66,9 @@ CREDIT HISTORY DATA:
 Provide your detailed credit analysis based on the ACCURATE assessment above.
 """
 
-    response = llm.invoke([
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=user_prompt)
-    ])
+    response = llm.invoke(
+        [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
+    )
     analysis = response.content
     bias_flags = detect_bias_signals(analysis, app_data)
 
@@ -73,17 +76,17 @@ Provide your detailed credit analysis based on the ACCURATE assessment above.
         **state,
         "credit_analysis": analysis,
         "bias_flags": state.get("bias_flags", []) + bias_flags,
-        "reasoning_chain": state.get("reasoning_chain", []) + [
-            f"Credit Analyst: Completed credit analysis for {state.get('case_id')}"
-        ]
+        "reasoning_chain": state.get("reasoning_chain", [])
+        + [f"Credit Analyst: Completed credit analysis for {state.get('case_id')}"],
     }
 
 
-def income_analyst_node(state: UnderwritingState, llm, policy_store=None) -> UnderwritingState:
+def income_analyst_node(
+    state: UnderwritingState, llm, policy_store=None
+) -> UnderwritingState:
     """Analyzes borrower's income stability and capacity to repay."""
     policies = retrieve_relevant_policies(
-        "employment income verification DTI ratio self-employed",
-        policy_store
+        "employment income verification DTI ratio self-employed", policy_store
     )
     app_data = state["sanitized_data"]
     debts = app_data.get("debts", {})
@@ -93,18 +96,18 @@ def income_analyst_node(state: UnderwritingState, llm, policy_store=None) -> Und
     debts_for_sum = {k: v for k, v in debts.items() if k != "total_monthly_debt"}
     total_debt = debts.get("total_monthly_debt", sum(debts_for_sum.values()))
 
-    dti_result = calculate_dti_ratio.invoke({
-        "monthly_debt": total_debt + proposed_payment,
-        "monthly_income": monthly_income
-    })
-    housing_ratio_result = calculate_housing_expense_ratio.invoke({
-        "monthly_payment": proposed_payment,
-        "monthly_income": monthly_income
-    })
-    debt_breakdown = calculate_total_debt_obligations.invoke({
-        "debts": debts_for_sum,
-        "proposed_payment": proposed_payment
-    })
+    dti_result = calculate_dti_ratio.invoke(
+        {
+            "monthly_debt": total_debt + proposed_payment,
+            "monthly_income": monthly_income,
+        }
+    )
+    housing_ratio_result = calculate_housing_expense_ratio.invoke(
+        {"monthly_payment": proposed_payment, "monthly_income": monthly_income}
+    )
+    debt_breakdown = calculate_total_debt_obligations.invoke(
+        {"debts": debts_for_sum, "proposed_payment": proposed_payment}
+    )
 
     system_prompt = f"""
 You are a Senior Mortgage Income Analyst with expertise in repayment capacity and income verification.
@@ -150,10 +153,9 @@ CALCULATED TOTAL DEBT OBLIGATIONS:
 Provide a detailed income analysis based only on the verified data and calculated tool outputs above.
 """
 
-    response = llm.invoke([
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=user_prompt)
-    ])
+    response = llm.invoke(
+        [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
+    )
     analysis = response.content
     bias_flags = detect_bias_signals(analysis, app_data)
 
@@ -161,17 +163,17 @@ Provide a detailed income analysis based only on the verified data and calculate
         **state,
         "income_analysis": analysis,
         "bias_flags": state.get("bias_flags", []) + bias_flags,
-        "reasoning_chain": state.get("reasoning_chain", []) + [
-            "Income Analyst: Completed income analysis with DTI calculation"
-        ]
+        "reasoning_chain": state.get("reasoning_chain", [])
+        + ["Income Analyst: Completed income analysis with DTI calculation"],
     }
 
 
-def asset_analyst_node(state: UnderwritingState, llm, policy_store=None) -> UnderwritingState:
+def asset_analyst_node(
+    state: UnderwritingState, llm, policy_store=None
+) -> UnderwritingState:
     """Analyzes borrower's assets and reserves."""
     policies = retrieve_relevant_policies(
-        "down payment reserves assets large deposits gift funds",
-        policy_store
+        "down payment reserves assets large deposits gift funds", policy_store
     )
     app_data = state["sanitized_data"]
     assets = app_data.get("assets", {})
@@ -181,15 +183,19 @@ def asset_analyst_node(state: UnderwritingState, llm, policy_store=None) -> Unde
     liquid_assets = assets.get("checking", 0) + assets.get("savings", 0)
     monthly_payment = loan.get("estimated_payment", 0)
 
-    reserves_result = calculate_reserves.invoke({
-        "liquid_assets": liquid_assets,
-        "monthly_payment": monthly_payment,
-        "required_months": 2
-    })
-    deposits_result = check_large_deposits.invoke({
-        "deposits": assets.get("recent_deposits", []),
-        "monthly_income": monthly_income
-    })
+    reserves_result = calculate_reserves.invoke(
+        {
+            "liquid_assets": liquid_assets,
+            "monthly_payment": monthly_payment,
+            "required_months": 2,
+        }
+    )
+    deposits_result = check_large_deposits.invoke(
+        {
+            "deposits": assets.get("recent_deposits", []),
+            "monthly_income": monthly_income,
+        }
+    )
 
     system_prompt = f"""
 You are a Senior Mortgage Asset Analyst with expertise in asset verification, reserves, and down payment sourcing.
@@ -231,10 +237,9 @@ LARGE DEPOSIT REVIEW:
 Provide a detailed asset analysis based only on the verified data and calculated tool outputs above.
 """
 
-    response = llm.invoke([
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=user_prompt)
-    ])
+    response = llm.invoke(
+        [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
+    )
     analysis = response.content
     bias_flags = detect_bias_signals(analysis, app_data)
 
@@ -242,17 +247,17 @@ Provide a detailed asset analysis based only on the verified data and calculated
         **state,
         "asset_analysis": analysis,
         "bias_flags": state.get("bias_flags", []) + bias_flags,
-        "reasoning_chain": state.get("reasoning_chain", []) + [
-            "Asset Analyst: Completed asset analysis and deposit review"
-        ]
+        "reasoning_chain": state.get("reasoning_chain", [])
+        + ["Asset Analyst: Completed asset analysis and deposit review"],
     }
 
 
-def collateral_analyst_node(state: UnderwritingState, llm, policy_store=None) -> UnderwritingState:
+def collateral_analyst_node(
+    state: UnderwritingState, llm, policy_store=None
+) -> UnderwritingState:
     """Analyzes property value and condition."""
     policies = retrieve_relevant_policies(
-        "appraisal property condition LTV collateral",
-        policy_store
+        "appraisal property condition LTV collateral", policy_store
     )
     app_data = state["sanitized_data"]
     property_data = app_data.get("property", {})
@@ -261,10 +266,9 @@ def collateral_analyst_node(state: UnderwritingState, llm, policy_store=None) ->
     loan_amount = loan.get("amount", 0)
     appraised_value = property_data.get("appraised_value", 0)
 
-    ltv_result = calculate_ltv_ratio.invoke({
-        "loan_amount": loan_amount,
-        "property_value": appraised_value
-    })
+    ltv_result = calculate_ltv_ratio.invoke(
+        {"loan_amount": loan_amount, "property_value": appraised_value}
+    )
 
     system_prompt = f"""
 You are a Senior Collateral Analyst with expertise in property valuation.
@@ -299,10 +303,9 @@ CALCULATED LTV RESULT:
 Provide your collateral analysis based only on the verified property data and calculated LTV result above.
 """
 
-    response = llm.invoke([
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=user_prompt)
-    ])
+    response = llm.invoke(
+        [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
+    )
     analysis = response.content
     bias_flags = detect_bias_signals(analysis, app_data)
 
@@ -310,13 +313,14 @@ Provide your collateral analysis based only on the verified property data and ca
         **state,
         "collateral_analysis": analysis,
         "bias_flags": state.get("bias_flags", []) + bias_flags,
-        "reasoning_chain": state.get("reasoning_chain", []) + [
-            "Collateral Analyst: Completed property analysis (LTV from tool)"
-        ]
+        "reasoning_chain": state.get("reasoning_chain", [])
+        + ["Collateral Analyst: Completed property analysis (LTV from tool)"],
     }
 
 
-def critic_agent_node(state: UnderwritingState, llm, policy_store=None) -> UnderwritingState:
+def critic_agent_node(
+    state: UnderwritingState, llm, policy_store=None
+) -> UnderwritingState:
     """Reviews all specialist analyses for consistency and completeness."""
     system_prompt = """
 You are a Quality Assurance Critic reviewing underwriting analyses.
@@ -352,21 +356,21 @@ BIAS FLAGS:
 Provide your critical review and synthesis.
 """
 
-    response = llm.invoke([
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=user_prompt)
-    ])
+    response = llm.invoke(
+        [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
+    )
 
     return {
         **state,
         "critic_review": response.content,
-        "reasoning_chain": state.get("reasoning_chain", []) + [
-            "Critic: Completed review of all specialist analyses"
-        ]
+        "reasoning_chain": state.get("reasoning_chain", [])
+        + ["Critic: Completed review of all specialist analyses"],
     }
 
 
-def decision_agent_node(state: UnderwritingState, llm, policy_store=None) -> UnderwritingState:
+def decision_agent_node(
+    state: UnderwritingState, llm, policy_store=None
+) -> UnderwritingState:
     """Synthesizes all findings into a final decision and credit memo."""
     import re
 
@@ -433,10 +437,9 @@ Provide:
 3. CREDIT_MEMO: (comprehensive decision documentation)
 """
 
-    response = llm.invoke([
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=user_prompt)
-    ])
+    response = llm.invoke(
+        [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
+    )
 
     content = response.content
     risk_score = 50
@@ -453,9 +456,9 @@ Provide:
         decision = "CONDITIONAL_APPROVAL"
 
     human_review_required = (
-        risk_score >= 65 or
-        len(state.get("bias_flags", [])) > 0 or
-        decision in ["DENIED", "CONDITIONAL_APPROVAL"]
+        risk_score >= 65
+        or len(state.get("bias_flags", [])) > 0
+        or decision in ["DENIED", "CONDITIONAL_APPROVAL"]
     )
 
     return {
@@ -465,7 +468,6 @@ Provide:
         "final_decision": decision,
         "human_review_required": human_review_required,
         "analysis_complete": True,
-        "reasoning_chain": state.get("reasoning_chain", []) + [
-            f"Decision Agent: Final decision {decision} with risk score {risk_score}"
-        ]
+        "reasoning_chain": state.get("reasoning_chain", [])
+        + [f"Decision Agent: Final decision {decision} with risk score {risk_score}"],
     }

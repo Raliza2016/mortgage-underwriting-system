@@ -35,7 +35,11 @@ def print_result(values: dict):
     human_review = values.get("human_review_required", False)
     bias_flags = values.get("bias_flags", [])
 
-    decision_symbol = {"APPROVED": "✅", "DENIED": "❌", "CONDITIONAL_APPROVAL": "⚠️"}.get(decision, "❓")
+    decision_symbol = {
+        "APPROVED": "✅",
+        "DENIED": "❌",
+        "CONDITIONAL_APPROVAL": "⚠️",
+    }.get(decision, "❓")
 
     print(f"\n{decision_symbol} Final Decision : {decision}")
     print(f"   Risk Score    : {risk_score}/100")
@@ -89,7 +93,9 @@ def main():
                 sys.exit(1)
 
     for case_data in cases:
-        print_header(f"Case: {case_data['case_id']}  (Expected: {case_data.get('expected_decision', 'N/A')})")
+        print_header(
+            f"Case: {case_data['case_id']}  (Expected: {case_data.get('expected_decision', 'N/A')})"
+        )
         print("Running multi-agent pipeline...\n")
 
         values = run_case(graph, case_data, thread_id=f"{case_data['case_id']}_run")

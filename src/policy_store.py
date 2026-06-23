@@ -6,6 +6,7 @@ try:
     from langchain.text_splitter import RecursiveCharacterTextSplitter
     from langchain_community.vectorstores import Chroma
     from langchain_openai import OpenAIEmbeddings
+
     PDF_SUPPORT = True
 except ImportError:
     PDF_SUPPORT = False
@@ -76,8 +77,7 @@ def create_policy_store(policy_pdf_path: str = "underwriting_policies.pdf"):
         documents = loader.load()
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
+            chunk_size=1000, chunk_overlap=200
         )
         policy_chunks = text_splitter.split_documents(documents)
 
@@ -87,7 +87,7 @@ def create_policy_store(policy_pdf_path: str = "underwriting_policies.pdf"):
         vectorstore = Chroma.from_documents(
             documents=policy_chunks,
             embedding=embeddings,
-            collection_name="underwriting_policies"
+            collection_name="underwriting_policies",
         )
         return vectorstore
 

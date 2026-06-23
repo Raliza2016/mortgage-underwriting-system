@@ -46,7 +46,9 @@ def calculate_ltv_ratio(loan_amount: float, property_value: float) -> str:
 
 
 @tool
-def calculate_reserves(liquid_assets: float, monthly_payment: float, required_months: int = 2) -> str:
+def calculate_reserves(
+    liquid_assets: float, monthly_payment: float, required_months: int = 2
+) -> str:
     """Calculate reserve coverage in months."""
     if monthly_payment <= 0:
         return "Error: Monthly payment must be greater than zero."
@@ -68,7 +70,9 @@ def calculate_reserves(liquid_assets: float, monthly_payment: float, required_mo
 
 
 @tool
-def calculate_housing_expense_ratio(monthly_payment: float, monthly_income: float) -> str:
+def calculate_housing_expense_ratio(
+    monthly_payment: float, monthly_income: float
+) -> str:
     """Calculate front-end (housing expense) ratio."""
     if monthly_income <= 0:
         return "Error: Monthly income must be greater than zero."
@@ -118,11 +122,13 @@ def check_large_deposits(deposits: list, monthly_income: float) -> str:
     for deposit in deposits:
         amount = deposit.get("amount", 0)
         if amount >= threshold:
-            large_deposits.append({
-                "amount": amount,
-                "date": deposit.get("date", "Unknown"),
-                "sourcing_required": True
-            })
+            large_deposits.append(
+                {
+                    "amount": amount,
+                    "date": deposit.get("date", "Unknown"),
+                    "sourcing_required": True,
+                }
+            )
     if not large_deposits:
         return (
             f"No large deposits identified "

@@ -48,7 +48,7 @@ def build_workflow(llm=None, policy_store=None):
             "bias_flags": [],
             "policy_violations": [],
             "reasoning_chain": [f"Application {state.get('case_id')} initialized"],
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     def supervisor_node(state: UnderwritingState) -> UnderwritingState:
@@ -121,7 +121,7 @@ def build_workflow(llm=None, policy_store=None):
             "asset": "asset",
             "collateral": "collateral",
             "critic": "critic",
-        }
+        },
     )
 
     workflow.add_edge("credit", "supervisor")

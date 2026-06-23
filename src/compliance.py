@@ -18,7 +18,9 @@ def sanitize_pii(data: Dict[str, Any]) -> Dict[str, Any]:
 
     if "phone" in sanitized:
         phone = sanitized["phone"]
-        sanitized["phone"] = f"***-***-{phone[-4:]}" if len(phone) >= 4 else "***-***-XXXX"
+        sanitized["phone"] = (
+            f"***-***-{phone[-4:]}" if len(phone) >= 4 else "***-***-XXXX"
+        )
 
     return sanitized
 
@@ -28,9 +30,16 @@ def detect_bias_signals(analysis: str, applicant_data: Dict[str, Any]) -> List[s
     flags = []
 
     protected_terms = [
-        "race", "color", "religion", "national origin",
-        "sex", "marital status", "age", "gender",
-        "disability", "familial status"
+        "race",
+        "color",
+        "religion",
+        "national origin",
+        "sex",
+        "marital status",
+        "age",
+        "gender",
+        "disability",
+        "familial status",
     ]
 
     analysis_lower = analysis.lower()
@@ -42,6 +51,8 @@ def detect_bias_signals(analysis: str, applicant_data: Dict[str, Any]) -> List[s
 
     if "zip" in applicant_data or "zipcode" in applicant_data:
         if re.search(r"\b(neighborhood|area)\b", analysis_lower):
-            flags.append("Potential geographic bias - review for Fair Lending compliance")
+            flags.append(
+                "Potential geographic bias - review for Fair Lending compliance"
+            )
 
     return flags
