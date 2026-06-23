@@ -1,0 +1,155 @@
+{
+  "_note": "All data below is entirely fictional and for testing purposes only. No real personal information.",
+  "test_cases": [
+    {
+      "case_id": "TC-001",
+      "name": "Sarah Johnson",
+      "ssn": "123-45-6789",
+      "email": "sarah.johnson@example.com",
+      "phone": "555-867-5309",
+      "address": "123 Maple Street, Springfield, IL 62701",
+      "credit_score": 760,
+      "dti_ratio": 0.32,
+      "expected_decision": "APPROVED",
+      "credit_history": {
+        "bankruptcies": 0,
+        "foreclosures": 0,
+        "late_payments_12mo": 0,
+        "collections": []
+      },
+      "employment": {
+        "type": "W2",
+        "employer": "Tech Corp Inc",
+        "years": 5,
+        "monthly_income": 8500,
+        "position": "Senior Software Engineer"
+      },
+      "loan": {
+        "amount": 320000,
+        "estimated_payment": 1850,
+        "purpose": "Purchase",
+        "type": "Conventional"
+      },
+      "debts": {
+        "auto_loan": 450,
+        "credit_cards": 150,
+        "student_loans": 300
+      },
+      "assets": {
+        "checking": 15000,
+        "savings": 45000,
+        "retirement": 120000,
+        "recent_deposits": [
+          {"amount": 2000, "date": "2024-01-15", "description": "Payroll"},
+          {"amount": 1500, "date": "2024-02-01", "description": "Payroll"}
+        ]
+      },
+      "property": {
+        "appraised_value": 400000,
+        "condition": "Good",
+        "type": "Single Family",
+        "year_built": 2005
+      }
+    },
+    {
+      "case_id": "TC-002",
+      "name": "Michael Chen",
+      "ssn": "987-65-4321",
+      "email": "michael.chen@example.com",
+      "phone": "555-234-5678",
+      "address": "456 Oak Avenue, Portland, OR 97201",
+      "credit_score": 680,
+      "dti_ratio": 0.44,
+      "expected_decision": "CONDITIONAL_APPROVAL",
+      "credit_history": {
+        "bankruptcies": 0,
+        "foreclosures": 0,
+        "late_payments_12mo": 1,
+        "collections": []
+      },
+      "employment": {
+        "type": "Self-Employed",
+        "business": "Chen Consulting LLC",
+        "years": 3,
+        "monthly_income": 7200,
+        "position": "Owner"
+      },
+      "loan": {
+        "amount": 280000,
+        "estimated_payment": 1680,
+        "purpose": "Purchase",
+        "type": "Conventional"
+      },
+      "debts": {
+        "auto_loan": 600,
+        "credit_cards": 800,
+        "personal_loan": 350
+      },
+      "assets": {
+        "checking": 8000,
+        "savings": 18000,
+        "retirement": 55000,
+        "recent_deposits": [
+          {"amount": 12000, "date": "2024-01-10", "description": "Business transfer - needs sourcing"},
+          {"amount": 1500, "date": "2024-02-05", "description": "Payroll"}
+        ]
+      },
+      "property": {
+        "appraised_value": 350000,
+        "condition": "Fair",
+        "type": "Single Family",
+        "year_built": 1985
+      }
+    },
+    {
+      "case_id": "TC-003",
+      "name": "Robert Martinez",
+      "ssn": "456-78-9012",
+      "email": "robert.martinez@example.com",
+      "phone": "555-345-6789",
+      "address": "789 Pine Road, Houston, TX 77001",
+      "credit_score": 580,
+      "dti_ratio": 0.58,
+      "expected_decision": "DENIED",
+      "credit_history": {
+        "bankruptcies": 1,
+        "foreclosures": 0,
+        "late_payments_12mo": 4,
+        "collections": ["Medical collection $2,400 (2022)", "Credit card charge-off $3,800 (2021)"]
+      },
+      "employment": {
+        "type": "W2",
+        "employer": "Retail Co",
+        "years": 1,
+        "monthly_income": 4200,
+        "position": "Sales Associate"
+      },
+      "loan": {
+        "amount": 195000,
+        "estimated_payment": 1320,
+        "purpose": "Purchase",
+        "type": "Conventional"
+      },
+      "debts": {
+        "auto_loan": 750,
+        "credit_cards": 600,
+        "personal_loan": 500,
+        "student_loans": 400
+      },
+      "assets": {
+        "checking": 2500,
+        "savings": 4000,
+        "retirement": 8000,
+        "recent_deposits": [
+          {"amount": 5000, "date": "2024-01-20", "description": "Unknown source"}
+        ]
+      },
+      "property": {
+        "appraised_value": 220000,
+        "condition": "Fair",
+        "type": "Single Family",
+        "year_built": 1962
+      }
+    }
+  ]
+}
